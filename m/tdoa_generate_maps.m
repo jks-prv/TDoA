@@ -32,12 +32,12 @@ function [tdoa,hSum]=tdoa_generate_maps(input, tdoa, plot_info)
       b = tdoa(i,j).lags_filter;
       tdoa(i,j).a = a;
       if ~input(i).use || ~input(j).use || sum(b)==0
-        tdoa(i,j).h = 20**2 * ones(size(dt{i}), 'single');
+        tdoa(i,j).h = 20^2 * ones(size(dt{i}), 'single');
         continue;
       end
-      xlag = sum(tdoa(i,j).peaks(b).**2 .* tdoa(i,j).lags(b))              / sum(tdoa(i,j).peaks(b).**2);
-      slag = sum(tdoa(i,j).peaks(b).**2 .* (tdoa(i,j).lags(b) - xlag).**2) / sum(tdoa(i,j).peaks(b).**2);
-      tdoa(i,j).h = single((dt{i}-dt{j}-xlag).**2 / slag);
+      xlag = sum(tdoa(i,j).peaks(b).^2 .* tdoa(i,j).lags(b))              / sum(tdoa(i,j).peaks(b).^2);
+      slag = sum(tdoa(i,j).peaks(b).^2 .* (tdoa(i,j).lags(b) - xlag).^2) / sum(tdoa(i,j).peaks(b).^2);
+      tdoa(i,j).h = single((dt{i}-dt{j}-xlag).^2 / slag);
       if isempty(hSum)
         hSum  = tdoa(i,j).h;
       else

@@ -43,7 +43,7 @@ function [tdoa,input,status,idx,xdi,eqs,c,nsigma]=tdoa_verify_lags(plot_info, td
       cls_mean = [get_cl_ii(j,comb_idx).mean; get_cl_jj(j,comb_idx).mean; get_cl_kk(j,comb_idx).mean];
       cls_std  = [get_cl_ii(j,comb_idx).std   get_cl_jj(j,comb_idx).std   get_cl_kk(j,comb_idx).std ];
       if max(cls_std) != Inf
-        _nsigma(k) = eqs(j).sgn * cls_mean / sqrt(sum(cls_std.**2));
+        _nsigma(k) = eqs(j).sgn * cls_mean / sqrt(sum(cls_std.^2));
       else
         _nsigma(k) = Inf;
       end
@@ -58,7 +58,7 @@ function [tdoa,input,status,idx,xdi,eqs,c,nsigma]=tdoa_verify_lags(plot_info, td
     nsigma(:,j) = _nsigma(cj);
   end
 
-  ## find combination with minimum sum(nsigma**2)
+  ## find combination with minimum sum(nsigma^2)
   [comb_idx, max_nsigma, sum_nsigma2] = find_min_nsigma(tdoa, input, idx, xdi, combinations, nsigma);
 
   ## if necessary exclude stations
@@ -94,7 +94,7 @@ function [tdoa,input,status,idx,xdi,eqs,c,nsigma]=tdoa_verify_lags(plot_info, td
     cls_std  = [get_cl_ii(j,comb_idx).std   get_cl_jj(j,comb_idx).std   get_cl_kk(j,comb_idx).std];
 
     dt_usec     = 1e6*[-1 +1 -1]*cls_mean;
-    err_dt_usec = 1e6*sqrt(sum(cls_std.**2));
+    err_dt_usec = 1e6*sqrt(sum(cls_std.^2));
     printf('test1 %3d: (%d,%d) (%d,%d) (%d,%d) [%+f,%+f,%+f] %+f %+f\n', ...
            j, eqs(j).ii, eqs(j).jj, eqs(j).kk, cls_mean, dt_usec, dt_usec/err_dt_usec);
     status.equations(j).status = 'OK';
@@ -144,7 +144,7 @@ function [tdoa,input,status,idx,xdi,eqs,c,nsigma]=tdoa_verify_lags(plot_info, td
 endfunction
 
 function [comb_idx,max_nsigma,sum_nsigma2]=find_min_nsigma(tdoa, input, idx, xdi, combinations, nsigma)
-  [sum_nsigma2,nsigma_idx]   = sort(sum(nsigma.**2, 2));
+  [sum_nsigma2,nsigma_idx]   = sort(sum(nsigma.^2, 2));
   [sum_nsigma2_unique,ii,jj] = unique(sum_nsigma2);
   n_sum = size(nsigma, 2);
   b     = sum_nsigma2_unique/n_sum < 3;
@@ -155,7 +155,7 @@ function [comb_idx,max_nsigma,sum_nsigma2]=find_min_nsigma(tdoa, input, idx, xdi
     sum_nsigma2 = sum_nsigma2_unique(b);
     metric      = zeros(size(sum_nsigma2));
     for i=1:numel(sum_nsigma2)
-      comb_idx = nsigma_idx(ii)(b)(i); # assert(sum_nsigma2(i) == sum(nsigma(comb_idx,:).**2))
+      comb_idx = nsigma_idx(ii)(b)(i); # assert(sum_nsigma2(i) == sum(nsigma(comb_idx,:).^2))
       bf       = [];
       for j=1:size(idx,1)
         k = idx(j,1);
@@ -207,9 +207,9 @@ function [equations,equation_ids]=make_equations(n, idx)
   m            = size(idx,1);
   sign2str     = @(x) '-0+'(2+sign(x));
   ## interpret combinations as 2-digit base-n numbers
-  comb_id      = @(i) (i-1)*[n;1]; ## maximum is (n-1)*(n+1) = n**2-1
+  comb_id      = @(i) (i-1)*[n;1]; ## maximum is (n-1)*(n+1) = n^2-1
   ## interpret equations as 3-digit base-(n^2-1) numbers
-  equation_id  = @(ii,jj,kk) sort([comb_id(ii) comb_id(jj) comb_id(kk)]) * (n**2-1).**[2;1;0];
+  equation_id  = @(ii,jj,kk) sort([comb_id(ii) comb_id(jj) comb_id(kk)]) * (n^2-1).^[2;1;0];
   equations    = struct;
   eq_counter   = 1;
   equation_ids = [];

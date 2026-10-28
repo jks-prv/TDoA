@@ -88,7 +88,7 @@ function [cl,b,nsigma]=tdoa_cluster_lags_single(b, lags, ncls, range)
     b = reshape(cut(end,j,:), size(lags));
     [b,cl(j).mean,cl(j).std] = tdoa_remove_outliers(b, lags, 3, 1, -1);
   end
-  nsigma = abs(diff(horzcat(cl.mean))) ./ sqrt(horzcat(cl.std)(1:end-1).**2 + horzcat(cl.std)(2:end).**2);
+  nsigma = abs(diff(horzcat(cl.mean))) ./ sqrt(horzcat(cl.std)(1:end-1).^2 + horzcat(cl.std)(2:end).^2);
   b      = squeeze(cut(end,:,:));
 
   for j=1:ncls

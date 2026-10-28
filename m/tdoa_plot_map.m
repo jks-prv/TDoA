@@ -281,6 +281,13 @@ function save_as_json_for_map(filename, pfn, h, h_max, bb_lon, bb_lat, plot_info
                           'east',  bb_lon(1),  ## NOTE: east and west were reversed before
                           'west',  bb_lon(2));
   s.plot_coutour = plot_contour;
+
+  ## required for Octave 9
+  s.polygons = {};
+  s.polygon_colors = {};
+  s.polylines = {};
+  s.polyline_colors = {};
+
   get_rgb = @(x) round(255*(plot_info.z_to_rgb(x, min(plot_info.h_max, h_max), plot_info.cmap)));
   c = get(h);
 

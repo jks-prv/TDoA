@@ -38,9 +38,9 @@ function [_x,z,P,Q,G]=test_ekf
   z = extract_measurements(input, tdoa);
 
 
-  P = diag([1 1])*0.1000**2;
-  Q = diag([1 1])*0.0100**2;
-  R = make_R(length(input), input) ##*80**2
+  P = diag([1 1])*0.1000^2;
+  Q = diag([1 1])*0.0100^2;
+  R = make_R(length(input), input) ##*80^2
 
   for j=1:5
     for i=1:min(60,size(z,2))
@@ -154,13 +154,13 @@ function ll=xyz2ll_wgs84(xyz)
   b = 6356752.314245;
   f = 1/298.257223563;
 
-  e2   = 2*f - f**2
+  e2   = 2*f - f^2
   eps2 = e2 / (1 - e2)
-  p = sqrt(sum(xyz(1:2).**2));
-  R = sqrt(sum(xyz.**2));
+  p = sqrt(sum(xyz(1:2).^2));
+  R = sqrt(sum(xyz.^2));
 
   tanbeta = b*xyz(3) / (a*p) * (1 + eps2*b/R);
-  sinbeta = tanbeta/sqrt(1-tanbeta**2);
+  sinbeta = tanbeta/sqrt(1-tanbeta^2);
   cosbeta = sinbeta / tanbeta;
 
   beta = atan2(xyz(3)*a, p*b);
@@ -168,7 +168,7 @@ function ll=xyz2ll_wgs84(xyz)
   cosbeta = cos(beta);
   phi = 0;
   if !isnan(cosbeta)
-    phi = atan2(xyz(3) + eps2*b*sinbeta**3, p - e2*a*cosbeta**3);
+    phi = atan2(xyz(3) + eps2*b*sinbeta^3, p - e2*a*cosbeta^3);
   end
   lambda = atan2(xyz(2),xyz(1));
 
@@ -189,8 +189,8 @@ function xyz=ll2xyz_wgs84(ll)
   b = 6356752.314245;
   f = 1/298.257223563;
 
-  eSq = 2*f - f**2;
-  nu  = a / sqrt(1 - eSq*sin(phi)**2);
+  eSq = 2*f - f^2;
+  nu  = a / sqrt(1 - eSq*sin(phi)^2);
 
   xyz = [ (nu+h)*cos(phi)*cos(lambda);
           (nu+h)*cos(phi)*sin(lambda);
@@ -204,5 +204,5 @@ function xyz=ll2xyz(ll)
               sin(llr(1))];
 endfunction
 function ll=xyz2ll(xyz)
-  ll = rad2deg([atan2(xyz(3), sqrt(sum(xyz(1:2).**2))) atan2(xyz(2), xyz(1))]);
+  ll = rad2deg([atan2(xyz(3), sqrt(sum(xyz(1:2).^2))) atan2(xyz(2), xyz(1))]);
 endfunction
